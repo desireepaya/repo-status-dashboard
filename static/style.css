@@ -1,0 +1,326 @@
+/* Repo Status — single stylesheet, no framework.
+   Light palette by default, dark via prefers-color-scheme. Status is always
+   carried by text as well as colour, so the page reads correctly in
+   monochrome and for colour-vision differences. */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --border: #dfe3e8;
+  --border-strong: #c8cdd4;
+  --text: #14181d;
+  --text-muted: #5b6570;
+  --text-faint: #828d99;
+  --accent: #2f6feb;
+
+  --ok: #1a7f47;
+  --ok-bg: #e6f4ec;
+  --warn: #9a6205;
+  --warn-bg: #fdf3e0;
+  --bad: #c02a1b;
+  --bad-bg: #fdecea;
+  --neutral: #4b5563;
+  --neutral-bg: #eef0f3;
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1216;
+    --surface: #171c22;
+    --border: #262d36;
+    --border-strong: #333c47;
+    --text: #e8ecf1;
+    --text-muted: #9aa5b1;
+    --text-faint: #77828e;
+    --accent: #6ea1ff;
+
+    --ok: #5cc98d;
+    --ok-bg: #12291d;
+    --warn: #e0a942;
+    --warn-bg: #2b2312;
+    --bad: #f08076;
+    --bad-bg: #2e1917;
+    --neutral: #a6b0bb;
+    --neutral-bg: #1e242b;
+
+    --shadow: none;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--neutral-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+/* ---- Header ---- */
+
+.page-header { margin-bottom: 28px; }
+
+.page-header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+
+/* ---- Summary strip ---- */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.stat-alert .stat-value { color: var(--bad); }
+
+/* ---- Repo cards ---- */
+
+.repo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.card-clear   { border-left-color: var(--ok); }
+.card-open    { border-left-color: var(--accent); }
+.card-pending { border-left-color: var(--warn); }
+.card-failing { border-left-color: var(--bad); }
+.card-error   { border-left-color: var(--bad); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 620;
+}
+
+.card-slug {
+  margin: 2px 0 0;
+  color: var(--text-faint);
+  font-size: 12.5px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+.card-description {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.error-message {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  background: var(--bad-bg);
+  color: var(--bad);
+  border-radius: 6px;
+  font-size: 13.5px;
+}
+
+.pill {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+.pill-clear   { background: var(--ok-bg);      color: var(--ok); }
+.pill-pending { background: var(--warn-bg);    color: var(--warn); }
+.pill-failing { background: var(--bad-bg);     color: var(--bad); }
+.pill-error   { background: var(--bad-bg);     color: var(--bad); }
+
+/* ---- Card sections ---- */
+
+.card-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.section-note {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.card-placeholder .empty { color: var(--text-faint); }
+
+/* ---- PR rows ---- */
+
+.pr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pr-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pr-title {
+  font-weight: 550;
+  color: var(--text);
+}
+
+.pr-title:hover { color: var(--accent); }
+
+.pr-number {
+  color: var(--text-faint);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-meta {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pr-author { font-weight: 500; }
+.sep { margin: 0 6px; color: var(--text-faint); }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+.tag-check-passing { background: var(--ok-bg);   color: var(--ok); }
+.tag-check-failing { background: var(--bad-bg);  color: var(--bad); }
+.tag-check-pending { background: var(--warn-bg); color: var(--warn); }
+
+.tag-review-approved          { background: var(--ok-bg);   color: var(--ok); }
+.tag-review-changes_requested { background: var(--bad-bg);  color: var(--bad); }
+.tag-review-review_requested  { background: var(--warn-bg); color: var(--warn); }
+
+.tag-conflict { background: var(--bad-bg); color: var(--bad); }
+
+/* ---- Footer ---- */
+
+.page-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
+.footer-note { color: var(--text-faint); }
+
+@media (max-width: 520px) {
+  .wrap { padding: 28px 16px 48px; }
+  .card-header { flex-direction: column; }
+}

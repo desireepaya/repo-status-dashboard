@@ -1,0 +1,22 @@
+{% macro summary_strip(dashboard) %}
+<section class="summary" aria-label="Summary">
+  <div class="stat">
+    <span class="stat-value">{{ dashboard.repo_count }}</span>
+    <span class="stat-label">{{ "repo" if dashboard.repo_count == 1 else "repos" }} tracked</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value">{{ dashboard.open_pr_count }}</span>
+    <span class="stat-label">open {{ "PR" if dashboard.open_pr_count == 1 else "PRs" }}</span>
+  </div>
+  <div class="stat {{ 'stat-alert' if dashboard.failing_check_count else '' }}">
+    <span class="stat-value">{{ dashboard.failing_check_count }}</span>
+    <span class="stat-label">failing {{ "check" if dashboard.failing_check_count == 1 else "checks" }}</span>
+  </div>
+  {% if dashboard.error_count %}
+  <div class="stat stat-alert">
+    <span class="stat-value">{{ dashboard.error_count }}</span>
+    <span class="stat-label">{{ "repo" if dashboard.error_count == 1 else "repos" }} unreachable</span>
+  </div>
+  {% endif %}
+</section>
+{% endmacro %}

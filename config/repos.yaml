@@ -1,0 +1,11 @@
+# Target repos for the dashboard.
+#
+# Adding a repo is a pure-config change — no code edits.
+#   slug:         required, "owner/name"
+#   display_name: optional, defaults to the repo name
+#
+# Phase 2 will add an optional `terraform_stacks:` list per repo.
+
+repos:
+  - slug: desireepaya/aws-security-baseline
+    display_name: AWS Security Baseline

@@ -1,0 +1,11 @@
+# Build output — regenerated on every run, published from CI
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# macOS
+.DS_Store

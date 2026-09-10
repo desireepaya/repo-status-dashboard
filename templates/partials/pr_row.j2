@@ -1,0 +1,28 @@
+{% macro pr_row(pr) %}
+<li class="pr">
+  <div class="pr-main">
+    <a class="pr-title" href="{{ pr.url }}">{{ pr.title }}</a>
+    <span class="pr-number">#{{ pr.number }}</span>
+  </div>
+
+  <div class="pr-meta">
+    <span class="pr-author">{{ pr.author }}</span>
+    <span class="sep">·</span>
+    <span>updated {{ pr.updated_at | relative_time }}</span>
+  </div>
+
+  <div class="tags">
+    {% if pr.draft %}
+    <span class="tag tag-draft">draft</span>
+    {% endif %}
+
+    <span class="tag tag-check tag-check-{{ pr.checks.state }}">{{ pr.checks.label }}</span>
+
+    <span class="tag tag-review tag-review-{{ pr.review_state }}">{{ pr.review_label }}</span>
+
+    {% if pr.has_conflicts %}
+    <span class="tag tag-conflict">conflicts</span>
+    {% endif %}
+  </div>
+</li>
+{% endmacro %}

@@ -1,0 +1,61 @@
+{% from "partials/pr_row.j2" import pr_row %}
+{% macro repo_card(repo) %}
+<article class="card card-{{ repo.state }}">
+
+  <header class="card-header">
+    <div class="card-heading">
+      <h2 class="card-title">
+        {% if repo.url %}
+        <a href="{{ repo.url }}">{{ repo.display_name }}</a>
+        {% else %}
+        {{ repo.display_name }}
+        {% endif %}
+      </h2>
+      <p class="card-slug">{{ repo.slug }}</p>
+    </div>
+    <span class="pill pill-{{ repo.state }}">
+      {% if repo.state == "error" %}unreachable
+      {% elif repo.state == "failing" %}{{ repo.failing_check_count }} failing
+      {% elif repo.state == "pending" %}checks running
+      {% elif repo.state == "open" %}{{ repo.open_pr_count }} open
+      {% else %}clear
+      {% endif %}
+    </span>
+  </header>
+
+  {% if repo.description %}
+  <p class="card-description">{{ repo.description }}</p>
+  {% endif %}
+
+  {% if repo.error %}
+  <p class="error-message">{{ repo.error }}</p>
+  {% else %}
+
+  <section class="card-section">
+    <h3 class="section-title">
+      Open pull requests
+      {% if repo.draft_pr_count %}
+      <span class="section-note">{{ repo.draft_pr_count }} draft</span>
+      {% endif %}
+    </h3>
+
+    {% if repo.prs %}
+    <ul class="pr-list">
+      {% for pr in repo.prs %}
+      {{ pr_row(pr) }}
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">No open pull requests.</p>
+    {% endif %}
+  </section>
+
+  <section class="card-section card-placeholder">
+    <h3 class="section-title">Infra health</h3>
+    <p class="empty">Coming in Phase 2: Terraform provider and module versions that have fallen behind.</p>
+  </section>
+
+  {% endif %}
+
+</article>
+{% endmacro %}
