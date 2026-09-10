@@ -18,7 +18,7 @@ For each repository being tracked:
 - Review status: approved, changes requested, or waiting on a reviewer
 - A warning if a pull request has merge conflicts
 
-At the top of the page, a summary strip shows totals: repositories tracked, open pull requests, and failing tests.
+At the top of the page, a summary strip shows totals: repositories tracked, open pull requests, and test failures.
 
 ![Dashboard showing open pull requests, test results and review status](docs/images/dashboard-populated.png)
 
@@ -69,6 +69,8 @@ This changes if I ever track a private repository. The automatic token cannot re
 **Left the published page public and unauthenticated.** Everything shown is already public information from public repositories. If a private repository is ever added, this decision has to be revisited alongside the token, because the page would then be publishing private information to an open URL.
 
 **One repository that fails to load does not break the page.** It renders as an "unreachable" card with the reason, and the rest of the dashboard still builds.
+
+**The test results tile says what was actually observed, not just a count of zero.** "0 failing tests" sounds reassuring, but it is the same number whether every test passed or no tests exist at all. A dashboard that cannot tell those apart is worse than no dashboard, because it reports good news it has not verified. So the tile distinguishes four cases: tests ran and some failed, tests ran and all passed, tests are set up but have not reported yet, and no tests are set up at all. Deciding which applies needs one extra API call per repository to ask whether any workflows exist. If that call fails, the dashboard falls back to the weaker wording rather than claiming something it could not confirm.
 
 ## Planned next
 

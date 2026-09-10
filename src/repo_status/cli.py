@@ -119,10 +119,11 @@ def _generate(args: argparse.Namespace) -> int:
         print(f"error: render failed: {exc}", file=sys.stderr)
         return 1
 
+    tile = dashboard.check_tile
     print(
         f"wrote {index_path} "
         f"({dashboard.repo_count} repos, {dashboard.open_pr_count} open PRs, "
-        f"{dashboard.failing_check_count} failing checks)",
+        f"{tile.value} {tile.label})",
         file=sys.stderr,
     )
 

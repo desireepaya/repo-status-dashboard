@@ -5,7 +5,8 @@ responses are trivial to stub, which matters because the primary target repo
 often has zero open PRs — the populated render path has to be exercisable
 without waiting for real PRs to exist.
 
-Requests per repo: 1 (repo metadata) + 1 (PR list) + 3 per open PR
+Requests per repo: 1 (repo metadata) + 1 (workflow list) + 1 (PR list)
++ 3 per open PR
 (detail for mergeable_state, reviews, check-runs). Comfortably inside the
 1,000 req/hr per-repo GITHUB_TOKEN ceiling on a daily cron.
 """
@@ -124,6 +125,8 @@ class GitHubCollector:
             report.description = info.get("description") or ""
             report.default_branch = info.get("default_branch") or ""
 
+            report.workflow_count = self._workflow_count(repo.slug)
+
             pulls = self._paginate(f"/repos/{repo.slug}/pulls", state="open")
             report.prs = [self._build_pr(repo.slug, pr) for pr in pulls]
             report.prs.sort(key=lambda pr: pr.updated_at, reverse=True)
@@ -136,6 +139,22 @@ class GitHubCollector:
             report.error = f"could not collect: {exc}"
 
         return report
+
+    def _workflow_count(self, slug: str) -> int | None:
+        """Count active CI workflows, or None if that can't be determined.
+
+        This is what separates "nothing failed" from "nothing runs". Returning
+        None rather than 0 on failure matters: a zero here is used to state
+        that no CI is configured, so it must be a fact rather than a fallback.
+        """
+        response = self._get(f"/repos/{slug}/actions/workflows", per_page=_PER_PAGE)
+        if not response.is_success:
+            return None
+        try:
+            workflows = response.json().get("workflows", [])
+        except ValueError:
+            return None
+        return sum(1 for w in workflows if w.get("state") == "active")
 
     def _build_pr(self, slug: str, pr: dict) -> PRSummary:
         number = pr["number"]

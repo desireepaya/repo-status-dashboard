@@ -8,9 +8,9 @@
     <span class="stat-value">{{ dashboard.open_pr_count }}</span>
     <span class="stat-label">open {{ "PR" if dashboard.open_pr_count == 1 else "PRs" }}</span>
   </div>
-  <div class="stat {{ 'stat-alert' if dashboard.failing_check_count else '' }}">
-    <span class="stat-value">{{ dashboard.failing_check_count }}</span>
-    <span class="stat-label">failing {{ "check" if dashboard.failing_check_count == 1 else "checks" }}</span>
+  <div class="stat {{ 'stat-alert' if dashboard.check_tile.alert else '' }}">
+    <span class="stat-value">{{ dashboard.check_tile.value }}</span>
+    <span class="stat-label">{{ dashboard.check_tile.label }}</span>
   </div>
   {% if dashboard.error_count %}
   <div class="stat stat-alert">

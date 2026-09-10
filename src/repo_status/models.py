@@ -19,6 +19,15 @@ FAILED_CONCLUSIONS = frozenset(
 
 
 @dataclass(frozen=True)
+class Tile:
+    """A single figure in the summary strip."""
+
+    value: str
+    label: str
+    alert: bool = False
+
+
+@dataclass(frozen=True)
 class CheckSummary:
     """Roll-up of the check-runs on a PR's head commit."""
 
@@ -97,8 +106,12 @@ class RepoReport:
     description: str = ""
     default_branch: str = ""
     prs: list[PRSummary] = field(default_factory=list)
+    # Number of active CI workflows in the repo. None means we could not
+    # determine it, which is deliberately distinct from a known zero: only a
+    # known zero justifies saying "no checks configured".
+    workflow_count: int | None = None
     # Set when this repo could not be collected. The rest of the dashboard
-    # still renders — one unreachable repo must not fail the whole build.
+    # still renders. One unreachable repo must not fail the whole build.
     error: str | None = None
 
     @property
@@ -120,6 +133,10 @@ class RepoReport:
     @property
     def failing_check_count(self) -> int:
         return sum(pr.checks.failed for pr in self.prs)
+
+    @property
+    def check_run_count(self) -> int:
+        return sum(pr.checks.total for pr in self.prs)
 
     @property
     def state(self) -> str:
@@ -155,3 +172,32 @@ class Dashboard:
     @property
     def error_count(self) -> int:
         return sum(1 for r in self.repos if r.error)
+
+    @property
+    def check_run_count(self) -> int:
+        return sum(r.check_run_count for r in self.repos)
+
+    @property
+    def check_tile(self) -> Tile:
+        """The summary figure for CI, worded for what was actually observed.
+
+        "0 failing checks" is misleading when nothing ran: it reads as a pass
+        when the truth is that there was nothing to report, or no CI at all.
+        Only a confirmed zero across every reachable repo justifies the
+        stronger "0 checks configured".
+        """
+        failing = self.failing_check_count
+        if failing:
+            noun = "check" if failing == 1 else "checks"
+            return Tile(str(failing), f"failing {noun}", alert=True)
+
+        if self.check_run_count:
+            return Tile("0", "failing checks")
+
+        reachable = [r for r in self.repos if r.ok]
+        counted = [r for r in reachable if r.workflow_count is not None]
+        if reachable and len(counted) == len(reachable):
+            if not any(r.workflow_count for r in counted):
+                return Tile("0", "checks configured")
+
+        return Tile("0", "checks reported")
