@@ -101,4 +101,10 @@ static/style.css               single stylesheet, no framework
 
 ## Setup note
 
-GitHub Pages has to be enabled once in repository settings, with the source set to GitHub Actions. This is a browser step and only needs doing a single time.
+GitHub Pages has to be enabled once, with the source set to GitHub Actions. This can be done from the command line, so the whole setup stays scriptable:
+
+```bash
+gh api -X POST repos/OWNER/REPO/pages -f build_type=workflow
+```
+
+It only needs doing a single time. Until it is done, the publishing step of the workflow will fail with a "Get Pages site failed" error, even though the build step succeeds.

@@ -77,7 +77,7 @@ One authenticated call chain per configured repo:
   3. Run `uv run repo-status generate --config config/repos.yaml --out dist/`.
   4. Upload `dist/` as Pages artifact and deploy.
 - Auth: `permissions: { contents: read, id-token: write, pages: write }`. `GITHUB_TOKEN` is sufficient for public target repos. No cloning of target repos in Phase 1 — the GitHub REST API covers all needed data.
-- Enable Pages in repo settings with source = "GitHub Actions" (one-time manual step).
+- Enable Pages with source = "GitHub Actions" (one-time). Not a browser-only step as originally assumed: `gh api -X POST repos/OWNER/REPO/pages -f build_type=workflow` does it. Until it is enabled, `actions/configure-pages` fails with "Get Pages site failed" while the build steps still succeed.
 
 ## Local dev
 
