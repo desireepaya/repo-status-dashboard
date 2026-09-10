@@ -39,7 +39,7 @@ repo-status-dashboard/
     └── build-dashboard.yml         # cron + Pages deploy
 ```
 
-Phase 2 adds `collectors/terraform.py`, a `tests/` dir with lock-file fixtures, and extends the config schema.
+Phase 2 adds `collectors/terraform.py` with lock-file fixtures, and extends the config schema. The `tests/` dir landed in Phase 1 instead of Phase 2: the stub harness written to verify the render path was already a test suite in everything but location, so it was formalised with pytest rather than thrown away.
 
 ## Config format (`config/repos.yaml`)
 

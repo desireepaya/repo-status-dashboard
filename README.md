@@ -61,6 +61,14 @@ GH_TOKEN=$(gh auth token) uv run repo-status generate --config config/repos.yaml
 
 Add `--serve` to open a local preview in the browser.
 
+## Tests
+
+```bash
+uv run pytest
+```
+
+The tests fake every GitHub response, so they need no network access and no token. That is deliberate rather than convenient: the repository this dashboard tracks usually has no open pull requests, so most of the states worth testing, such as a failing test run or a merge conflict, cannot be produced with real data.
+
 ## Design decisions
 
 **Used the GitHub API directly instead of a client library.** It keeps the project down to three dependencies, and it makes the data easy to fake during development. That second point mattered: the repository being tracked usually has zero open pull requests, so the "page full of pull requests" view cannot be tested against live data.
@@ -111,6 +119,7 @@ src/repo_status/
   render.py                    turns data into HTML
 templates/                     page templates
 static/style.css               single stylesheet, no framework
+tests/                         faked API responses, no network needed
 .github/workflows/             scheduled build and publish
 ```
 
