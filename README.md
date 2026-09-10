@@ -20,6 +20,10 @@ For each repository being tracked:
 
 At the top of the page, a summary strip shows totals: repositories tracked, open pull requests, and failing tests.
 
+![Dashboard showing open pull requests, test results and review status](docs/images/dashboard-populated.png)
+
+*Sample data. The pull requests above are test fixtures, not real ones, used to check how the page renders when there is work in progress. The live link shows the real current state.*
+
 ## Why I built it
 
 GitHub shows you what is pending inside one repository. It does not give you a single view across all of them. That gap does not matter much with one repository, but it grows with every repository added. This dashboard was built early so it is already in place when the repository count makes it useful.
