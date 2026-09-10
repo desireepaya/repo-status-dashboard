@@ -4,7 +4,7 @@
 
 You want a shareable static-HTML dashboard that reports the current state of your repos — starting with `desireepaya/aws-security-baseline` and expandable via a hand-configured list. Regenerated on a GitHub Actions cron and published to public GitHub Pages.
 
-**Phase 1 (this plan)**: pending changes only — open PRs and CI conclusions. Live public URL, end-to-end.
+**Phase 1 (this plan)**: open PRs, CI conclusions, and recent commit activity. Live public URL, end-to-end.
 
 **Phase 2 (deferred)**: Terraform infra health (provider/module version lag from `.terraform.lock.hcl`).
 
@@ -56,6 +56,8 @@ Adding a new repo is a pure-config change — no code edits. Phase 2 will add an
 One authenticated call chain per configured repo:
 - Open PRs: number, title, author, draft flag, `mergeable_state`, requested reviewers, review decision.
 - For each PR: latest commit's check-runs summary (pass / fail / pending count).
+- Active workflow count per repo, so "no checks failing" can be distinguished from "no checks configured".
+- Five most recent default-branch commits, plus a "last commit" recency line.
 - Uses `GITHUB_TOKEN` in GHA; a local PAT env var (`GH_TOKEN`) for dev.
 - Prefer plain `httpx` calls over `PyGithub` to keep the dependency surface small and responses easy to stub in local dev.
 
@@ -99,7 +101,7 @@ One authenticated call chain per configured repo:
 
 ## Phasing
 
-1. **Phase 1 — MVP + Ship**: repo skeleton, GitHub collector, Jinja render, local CLI, GHA cron, Pages deploy. Live public URL. Monitors just `aws-security-baseline`. PR/CI data only. **This is where Phase 1 ends — you should have a working live URL.**
+1. **Phase 1 — MVP + Ship**: repo skeleton, GitHub collector, Jinja render, local CLI, GHA cron, Pages deploy. Live public URL. Monitors just `aws-security-baseline`. PR, CI and recent-commit data. **This is where Phase 1 ends — you should have a working live URL.**
 2. **Phase 2 — Terraform metadata collector**: add `collectors/terraform.py`, `.terraform.lock.hcl` parsing, registry version-lag comparison, fixture tests, extend config schema with `terraform_stacks`.
 3. **Extend**: add more repos to `repos.yaml`.
 4. **Later**: drift detection via real `terraform plan` (needs AWS OIDC role).
@@ -113,7 +115,7 @@ One authenticated call chain per configured repo:
 ## Settled decisions
 
 - **GitHub repo name**: `repo-status-dashboard` (matches the local directory; no shorter alias).
-- **"Commits since last tag"**: dropped from Phase 1 — no tags in use yet, so the surrogate would report nothing meaningful. Phase 1 surfaces PR + CI data only. Revisit if/when releases get tagged.
+- **"Commits since last tag"**: dropped, since no tags are in use. Superseded during implementation by a plain list of the five most recent default-branch commits plus a "last commit" recency line, which needs no tags and answers the same question better. A 30-day commit *count* was considered and rejected as a vanity metric: commit granularity varies too much for the number to carry meaning, and a low count misleads downward on a portfolio page. This widens Phase 1 from "pending changes" to "pending changes and recent activity" — a deliberate call, not scope drift.
 - **No dedicated token for GitHub Actions** — use the built-in `GITHUB_TOKEN`. Public repo data is readable by any authenticated token, so the dashboard repo's own `GITHUB_TOKEN` can read PRs and check-runs from the target repos; Pages deploy is covered by the `permissions:` block. A PAT would be a *downgrade*: long-lived, stored as a secret, manually rotated, broader scope than needed, on a public-facing project. `GITHUB_TOKEN` is minted per job and expires with it.
   - Rate limit is a non-issue: cost is ~`1 + (open PRs)` requests per target repo against a 1,000 req/hr per-repo ceiling, on a daily cron.
   - **Trigger to revisit: the first private repo added to `repos.yaml`.** `GITHUB_TOKEN` cannot read a private repo outside its own — a hard boundary, not a permissions tweak. At that point use a fine-grained PAT (read-only Pull requests + Checks + Metadata, selected repos, with an expiry) as a repo secret, or a GitHub App installation token for short-lived credentials. The collector needs no change either way — it reads whatever token is in the env var.

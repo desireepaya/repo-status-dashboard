@@ -305,6 +305,49 @@ code {
 
 .tag-conflict { background: var(--bad-bg); color: var(--bad); }
 
+/* ---- Commit rows ---- */
+
+.commit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.commit {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.commit-sha {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.commit-sha:hover { color: var(--accent); }
+
+.commit-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.commit-title {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.commit-meta {
+  margin-top: 1px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
 /* ---- Footer ---- */
 
 .page-footer {

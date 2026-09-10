@@ -1,4 +1,5 @@
 {% from "partials/pr_row.j2" import pr_row %}
+{% from "partials/commit_row.j2" import commit_row %}
 {% macro repo_card(repo) %}
 <article class="card card-{{ repo.state }}">
 
@@ -47,6 +48,25 @@
     </ul>
     {% else %}
     <p class="empty">No open pull requests.</p>
+    {% endif %}
+  </section>
+
+  <section class="card-section">
+    <h3 class="section-title">
+      Recent commits
+      {% if repo.last_commit_at %}
+      <span class="section-note">last commit {{ repo.last_commit_at | relative_time }}</span>
+      {% endif %}
+    </h3>
+
+    {% if repo.recent_commits %}
+    <ul class="commit-list">
+      {% for commit in repo.recent_commits %}
+      {{ commit_row(commit) }}
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="empty">No commits found on the default branch.</p>
     {% endif %}
   </section>
 

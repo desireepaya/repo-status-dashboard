@@ -98,6 +98,19 @@ class PRSummary:
         }.get(self.review_state, self.review_state)
 
 
+@dataclass(frozen=True)
+class CommitSummary:
+    sha: str
+    title: str
+    author: str
+    url: str
+    committed_at: datetime
+
+    @property
+    def short_sha(self) -> str:
+        return self.sha[:7]
+
+
 @dataclass
 class RepoReport:
     slug: str
@@ -106,6 +119,9 @@ class RepoReport:
     description: str = ""
     default_branch: str = ""
     prs: list[PRSummary] = field(default_factory=list)
+    # Most recent commits on the default branch, newest first. Open PRs say
+    # what is waiting; these say what is actually moving.
+    recent_commits: list[CommitSummary] = field(default_factory=list)
     # Number of active CI workflows in the repo. None means we could not
     # determine it, which is deliberately distinct from a known zero: only a
     # known zero justifies saying "no checks configured".
@@ -137,6 +153,10 @@ class RepoReport:
     @property
     def check_run_count(self) -> int:
         return sum(pr.checks.total for pr in self.prs)
+
+    @property
+    def last_commit_at(self) -> datetime | None:
+        return self.recent_commits[0].committed_at if self.recent_commits else None
 
     @property
     def state(self) -> str:

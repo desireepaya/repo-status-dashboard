@@ -1,0 +1,9 @@
+{% macro commit_row(commit) %}
+<li class="commit">
+  <a class="commit-sha" href="{{ commit.url }}">{{ commit.short_sha }}</a>
+  <div class="commit-body">
+    <span class="commit-title">{{ commit.title }}</span>
+    <span class="commit-meta">{{ commit.author }}<span class="sep">·</span>{{ commit.committed_at | relative_time }}</span>
+  </div>
+</li>
+{% endmacro %}

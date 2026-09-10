@@ -6,7 +6,7 @@ often has zero open PRs — the populated render path has to be exercisable
 without waiting for real PRs to exist.
 
 Requests per repo: 1 (repo metadata) + 1 (workflow list) + 1 (PR list)
-+ 3 per open PR
++ 1 (recent commits) + 3 per open PR
 (detail for mergeable_state, reviews, check-runs). Comfortably inside the
 1,000 req/hr per-repo GITHUB_TOKEN ceiling on a daily cron.
 """
@@ -22,6 +22,7 @@ from ..models import (
     FAILED_CONCLUSIONS,
     PASSED_CONCLUSIONS,
     CheckSummary,
+    CommitSummary,
     PRSummary,
     RepoReport,
 )
@@ -126,6 +127,7 @@ class GitHubCollector:
             report.default_branch = info.get("default_branch") or ""
 
             report.workflow_count = self._workflow_count(repo.slug)
+            report.recent_commits = self._recent_commits(repo.slug)
 
             pulls = self._paginate(f"/repos/{repo.slug}/pulls", state="open")
             report.prs = [self._build_pr(repo.slug, pr) for pr in pulls]
@@ -155,6 +157,43 @@ class GitHubCollector:
         except ValueError:
             return None
         return sum(1 for w in workflows if w.get("state") == "active")
+
+    def _recent_commits(self, slug: str, limit: int = 5) -> list[CommitSummary]:
+        """The newest commits on the default branch.
+
+        A repo with no commits yet answers 409, which is not an error worth
+        surfacing: an empty repo simply has nothing to show here.
+        """
+        response = self._get(f"/repos/{slug}/commits", per_page=limit)
+        if not response.is_success:
+            return []
+
+        try:
+            items = response.json()
+        except ValueError:
+            return []
+
+        commits = []
+        for item in items[:limit]:
+            commit = item.get("commit") or {}
+            message = (commit.get("message") or "").strip()
+            commit_author = commit.get("author") or {}
+            # `author` is the linked GitHub account and can be null for
+            # commits made under an address with no account attached.
+            account = item.get("author") or {}
+
+            commits.append(
+                CommitSummary(
+                    sha=item.get("sha", ""),
+                    title=message.splitlines()[0] if message else "(no message)",
+                    author=account.get("login")
+                    or commit_author.get("name")
+                    or "unknown",
+                    url=item.get("html_url", ""),
+                    committed_at=_parse_ts(commit_author.get("date")),
+                )
+            )
+        return commits
 
     def _build_pr(self, slug: str, pr: dict) -> PRSummary:
         number = pr["number"]

@@ -3,7 +3,7 @@
 
 # Repo Status Dashboard
 
-A dashboard that shows what work is pending across my GitHub repositories. It rebuilds itself every day and publishes to a public web page.
+A dashboard that shows what work is pending, and what has recently changed, across my GitHub repositories. It rebuilds itself every day and publishes to a public web page.
 
 **Live**: https://desireepaya.github.io/repo-status-dashboard/
 
@@ -17,12 +17,17 @@ For each repository being tracked:
 - Whether the automated tests on each pull request passed, failed, or are still running
 - Review status: approved, changes requested, or waiting on a reviewer
 - A warning if a pull request has merge conflicts
+- The five most recent commits on the main branch, and how long ago the last one landed
 
 At the top of the page, a summary strip shows totals: repositories tracked, open pull requests, and test failures.
 
-![Dashboard showing open pull requests, test results and review status](docs/images/dashboard-populated.png)
+![The dashboard as it currently looks, listing recent commits on the tracked repository](docs/images/dashboard-live.png)
 
-*Sample data. The pull requests above are test fixtures, not real ones, used to check how the page renders when there is work in progress. The live link shows the real current state.*
+The page above is the real one, generated from live data. Since I work alone and commit straight to the main branch, there are usually no open pull requests to show, so here is the same page with pull requests present:
+
+![The same dashboard with three open pull requests, showing test results, review status and a merge conflict warning](docs/images/dashboard-populated.png)
+
+*The second image uses test fixtures rather than real pull requests, so that the review and test features can be seen. The live link always shows the real current state.*
 
 ## Why I built it
 
@@ -35,7 +40,7 @@ config/repos.yaml  ->  GitHub API  ->  HTML page  ->  published to GitHub Pages
 ```
 
 1. A config file lists which repositories to track.
-2. A Python script calls the GitHub API and collects pull request and test data.
+2. A Python script calls the GitHub API and collects pull request, test and commit data.
 3. Jinja2 templates turn that data into a single HTML page.
 4. A scheduled GitHub Actions job runs the whole pipeline daily at 15:00 UTC and publishes the result.
 
@@ -70,6 +75,10 @@ This changes if I ever track a private repository. The automatic token cannot re
 
 **One repository that fails to load does not break the page.** It renders as an "unreachable" card with the reason, and the rest of the dashboard still builds.
 
+**Recent commits are listed, but not counted.** Open pull requests measure work that is waiting for review, which assumes a review workflow exists. Working alone and committing straight to the main branch, that number is almost always zero, so the dashboard had very little to show. Listing the last five commits fixes that, because it says what is actually being worked on.
+
+A count of commits over the last month was considered and rejected. One substantial commit and twenty small fixes produce very different numbers and close to the opposite meaning, so the figure invites a comparison it cannot support. On a page a recruiter might scan, a low number reads as inactive when it may mean careful. A single "last commit" timestamp answers the same question without implying a score.
+
 **The test results tile says what was actually observed, not just a count of zero.** "0 failing tests" sounds reassuring, but it is the same number whether every test passed or no tests exist at all. A dashboard that cannot tell those apart is worse than no dashboard, because it reports good news it has not verified. So the tile distinguishes four cases: tests ran and some failed, tests ran and all passed, tests are set up but have not reported yet, and no tests are set up at all. Deciding which applies needs one extra API call per repository to ask whether any workflows exist. If that call fails, the dashboard falls back to the weaker wording rather than claiming something it could not confirm.
 
 ## Planned next
@@ -84,7 +93,7 @@ This changes if I ever track a private repository. The automatic token cannot re
 
 **Uncommitted local work.** A scheduled job running on GitHub's servers has no visibility into my laptop. Reporting on it would mean either installing something locally or showing data that is out of date.
 
-**Unreleased commit counts.** This was planned as a way to show work that had been merged but not released. It was cut because I do not tag releases yet, so it would have shown an empty result every time. Worth adding once tagging starts.
+**Commit counts.** Two versions of this were considered. Counting commits since the last release was cut because I do not tag releases yet, so it would have shown an empty result every time. Counting commits over the last month was cut as a vanity metric, for the reasons in the design decisions above. What replaced both is the list of recent commits, which shows the work itself rather than a number standing in for it.
 
 ## Known limitation
 
