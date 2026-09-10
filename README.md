@@ -42,7 +42,7 @@ config/repos.yaml  ->  GitHub API  ->  HTML page  ->  published to GitHub Pages
 1. A config file lists which repositories to track.
 2. A Python script calls the GitHub API and collects pull request, test and commit data.
 3. Jinja2 templates turn that data into a single HTML page.
-4. A scheduled GitHub Actions job runs the whole pipeline daily at 15:00 UTC and publishes the result.
+4. A scheduled GitHub Actions job runs the whole pipeline once a day and publishes the result.
 
 Adding a repository to the dashboard is a config change. No code edits are needed:
 
@@ -67,7 +67,7 @@ Add `--serve` to open a local preview in the browser.
 uv run pytest
 ```
 
-The tests fake every GitHub response, so they need no network access and no token. That is deliberate rather than convenient: the repository this dashboard tracks usually has no open pull requests, so most of the states worth testing, such as a failing test run or a merge conflict, cannot be produced with real data.
+The daily job runs these before publishing, so a broken change cannot reach the live page. The tests fake every GitHub response, so they need no network access and no token. That is deliberate rather than convenient: the repository this dashboard tracks usually has no open pull requests, so most of the states worth testing, such as a failing test run or a merge conflict, cannot be produced with real data.
 
 ## Design decisions
 

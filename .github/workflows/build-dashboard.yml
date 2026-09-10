@@ -35,6 +35,9 @@ jobs:
       - name: Sync dependencies
         run: uv sync --locked
 
+      - name: Run tests
+        run: uv run pytest -q
+
       - name: Generate dashboard
         env:
           # Sufficient for public target repos. A private target repo would

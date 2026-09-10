@@ -71,7 +71,7 @@ One authenticated call chain per configured repo:
 
 ## GitHub Actions workflow (`.github/workflows/build-dashboard.yml`)
 
-- Triggers: `schedule: cron: '0 15 * * *'` (15:00 UTC daily), `workflow_dispatch`, and `push` to `main` (so a `repos.yaml` edit rebuilds the site immediately rather than waiting for the next cron).
+- Triggers: `schedule: cron: '0 15 * * *'` (nominally 15:00 UTC daily; observed in practice at 17:57 UTC, since GitHub dispatches scheduled events at low priority and can delay them by hours or skip them entirely under load, so the page must not promise a clock time), `workflow_dispatch`, and `push` to `main` (so a `repos.yaml` edit rebuilds the site immediately rather than waiting for the next cron).
 - Uses the modern Pages flow: `actions/configure-pages`, `actions/upload-pages-artifact`, `actions/deploy-pages`.
 - Steps:
   1. Checkout dashboard repo.
