@@ -147,7 +147,8 @@ code {
   padding: 18px 20px;
 }
 
-.card-clear   { border-left-color: var(--ok); }
+/* No green for "no open PRs": it states an observation, not a clean bill of
+   health. The card keeps the default neutral edge. */
 .card-open    { border-left-color: var(--accent); }
 .card-pending { border-left-color: var(--warn); }
 .card-failing { border-left-color: var(--bad); }
@@ -199,7 +200,6 @@ code {
   color: var(--neutral);
 }
 
-.pill-clear   { background: var(--ok-bg);      color: var(--ok); }
 .pill-pending { background: var(--warn-bg);    color: var(--warn); }
 .pill-failing { background: var(--bad-bg);     color: var(--bad); }
 .pill-error   { background: var(--bad-bg);     color: var(--bad); }

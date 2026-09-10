@@ -18,7 +18,7 @@
       {% elif repo.state == "failing" %}{{ repo.failing_check_count }} failing
       {% elif repo.state == "pending" %}checks running
       {% elif repo.state == "open" %}{{ repo.open_pr_count }} open
-      {% else %}clear
+      {% else %}no open PRs
       {% endif %}
     </span>
   </header>
